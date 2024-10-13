@@ -22,11 +22,6 @@ def main():
     generatedVideo = processVideo(video_path=videoTemplate)
     print(f"Video file created: {generatedVideo}")
 
-    # 4. Split the video into parts
-    #print("Split video...")
-    #videoParts = splitVideo(generatedVideo)
-    #print(f"Generated {len(videoParts)} video parts")
-
 
 if __name__ == "__main__":
     main()

@@ -88,7 +88,7 @@ def split_video_into_parts(video_clip, part_duration):
 
 # Main function to combine everything
 def processVideo(video_path="./video_templates/MinecraftVid1.mp4", audio_path="./generated_audio/output.wav"):
-    output_path = "./generated_video/mergedVideo.mp4"
+    output_dir = "./generated_video/"
     # Load video and audio files
     video_clip = VideoFileClip(video_path)
     audio_clip = AudioFileClip(audio_path)
@@ -102,18 +102,29 @@ def processVideo(video_path="./video_templates/MinecraftVid1.mp4", audio_path=".
 
     # Get automatic captions
     captions = get_transcription_with_timing(audio_path)
-
     # Add captions to video
     video_with_captions = add_captions(cropped_video, captions)
-
+    
     # Add title to the video
-    video_with_captions_title = add_title(video_with_captions, title="Insane Story!!")
+    final_video = add_title(video_with_captions, title="Insane Story!!")
 
-    # Save the final video with captions
-    video_with_captions_title.write_videofile(output_path, codec="libx264", audio_codec="aac", temp_audiofile=f"./temp/mergedVideo_temp.mp4")
+    # Define the part length in seconds
+    part_length = 70  # 1 minute and 10 seconds
+
+    output_files = []
+
+    # Split video by defined part length
+    for i, start in enumerate(range(0, int(final_video.duration), part_length)):
+        end = min(start + part_length, final_video.duration)
+        part_name = f"part_{i+1}.mp4"
+        output_path = os.path.join(output_dir, part_name)
+
+        # Use subclip to extract and write each segment
+        final_video.subclip(start, end).write_videofile(output_path, codec="libx264", audio_codec="aac", temp_audiofile=f"./temp/part_{i+1}_temp.mp4")
+        output_files.append(output_path)
 
     # Return the location of the saved video
-    return output_path
+    return output_files
 
 if __name__ == "__main__":
     print(processVideo())

@@ -1,5 +1,9 @@
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
+###
+# Not used in programm, only used for creating templates, execute directly
+#
+
 def splitVideo(inputFile, videoTitle="splitVideo", timeInteval=65):
     # Load the video
     video = VideoFileClip(inputFile)
