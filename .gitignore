@@ -1,0 +1,8 @@
+python_enviroment/
+.vscode
+.env
+video_templates/*
+generated_video/*
+generated_audio/*
+temp/*
+__pycache__
