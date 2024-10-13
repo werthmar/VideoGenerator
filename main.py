@@ -2,7 +2,7 @@ from storyGenerator import generateStory
 from audioGenerator import generateAudio
 from videoPicker import selectRandomVideo
 from videoGenerator import processVideo
-from videoSpliter import splitVideo
+import subprocess
 
 def main():
     # 1. Generate the story
@@ -23,5 +23,25 @@ def main():
     print(f"Video file created: {generatedVideo}")
 
 
+def testUpload():
+    # Define your command as a list
+    command = [
+        'python', 'cli.py', 'upload',
+        '--user', 'my_saved_username',
+        '-v', '../generated_video/part_1.mp4',
+        '-t', 'My video title'
+    ]
+
+    try:
+        # Run the command
+        result = subprocess.run(command, cwd='./tiktok_auto_uploader', capture_output=True, text=True, check=True)
+
+        # Print the output
+        print("Output:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print(f"Command failed with exit code {e.returncode}")
+        print("Error message:", e.stderr, e.stdout)
+
 if __name__ == "__main__":
-    main()
+    #main()
+    testUpload()
