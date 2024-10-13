@@ -1,3 +1,14 @@
-write everything in 1 paragraph. do not use the special signs like - or ". Write in 4 parts without specifying the parts. Try to be around 800 words. Do not use Abbreviations like HR, write the full word instead.
+- Prompt:
+Write a story like the stories from reddit talking about any of the following topics, but pick only one topic:
+how your family tried to steal your house, your car or any other valuable or
+a am i the asshole story or
+a how i got fired story or
+a what was your wierdes customer interaction or wierdest request you got working a certain job or
+an encounter with a crazy karen
 
-generate a compelling title for this story in 2-3 words with an emoji at the end and exclamationmarks.
+write everything in 1 paragraph. do not use the special signs like - or ". Write in multiple parts without specifying the parts. A Story segment can cross over multiple parts. Try to be around 800 words. Do not use Abbreviations like HR, write the full word instead. After the story generate a compelling title for this story in 2-3 short words with an emoji at the end and exclamationmarks. Use normal, everyday language and avoid fancy words, wordplay or metaphors. Write like a real human talking about their experience.
+
+
+
+old:
+each part should have a maximum of 950 characters including spaces

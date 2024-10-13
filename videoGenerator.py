@@ -1,7 +1,12 @@
 import os
-from moviepy.editor import VideoFileClip, AudioFileClip, TextClip, CompositeVideoClip
+from moviepy.editor import VideoFileClip, AudioFileClip, TextClip, CompositeVideoClip, ImageClip
+from PIL import Image, ImageFont, ImageDraw
 from moviepy.video.fx.all import crop
 import speech_recognition as sr
+from pilmoji import Pilmoji
+import numpy as np
+import re
+import emoji
 
 # Function to generate transcription with timing
 def get_transcription_with_timing(audio_path):
@@ -51,11 +56,36 @@ def add_captions(video_clip, captions):
 
     return CompositeVideoClip(output_clips, size=video_clip.size)
 
-def add_title(video_clip, title="Crazy Story!!"):
+def add_title(video_clip, title):
+    # Extract emojis
+    emojis = [char for char in title if char in emoji.EMOJI_DATA]
+    emojis = ''.join(emojis)
+    title = re.sub(emoji.get_emoji_regexp(), '', title)
+    
+    # Add the title
     title_clip = (TextClip(title.upper(), fontsize=70, font="Verdana-bold", color='black', bg_color='white')
-                  .set_position(('center', 40))  # Position at top center with some margin
+                  .set_position(('center', 50))  # Position at top center with some margin
                   .set_duration(video_clip.duration))
-    return CompositeVideoClip([video_clip, title_clip])
+    
+    video_with_title= CompositeVideoClip([video_clip, title_clip])
+    #return CompositeVideoClip([video_clip, title_clip])
+
+    # Add the emoji
+    emoji_font = ImageFont.truetype('./fonts/NoToColorEmoji-Regular.ttf', 120)
+    # Calculate the size needed for the image
+    text_size = emoji_font.getsize(emojis.strip())
+    # Create a transparent image
+    image = Image.new('RGBA', text_size, (0, 0, 0, 0))
+    # Use Pilmoji to draw the emoji onto the image
+    with Pilmoji(image) as pilmoji:
+        pilmoji.text((0, 0), emojis.strip(), (0, 0, 0), emoji_font)
+
+    # Create the emoji image clip
+    emoji_clip = (ImageClip(np.array(image)).set_position(('center', 160)).set_duration(video_clip.duration))
+
+    return CompositeVideoClip([video_with_title, emoji_clip])
+
+
 
 def crop_to_vertical(video, target_width=1080, target_height=1920):
     original_width, original_height = video.size
@@ -87,7 +117,7 @@ def split_video_into_parts(video_clip, part_duration):
     return parts
 
 # Main function to combine everything
-def processVideo(video_path="./video_templates/MinecraftVid1.mp4", audio_path="./generated_audio/output.wav"):
+def processVideo(title, video_path="./video_templates/MinecraftVid1.mp4", audio_path="./generated_audio/output.wav"):
     output_dir = "./generated_video/"
     # Load video and audio files
     video_clip = VideoFileClip(video_path)
@@ -106,7 +136,7 @@ def processVideo(video_path="./video_templates/MinecraftVid1.mp4", audio_path=".
     video_with_captions = add_captions(cropped_video, captions)
     
     # Add title to the video
-    final_video = add_title(video_with_captions, title="Insane Story!!")
+    final_video = add_title(video_with_captions, title)
 
     # Define the part length in seconds
     part_length = 70  # 1 minute and 10 seconds
@@ -116,15 +146,15 @@ def processVideo(video_path="./video_templates/MinecraftVid1.mp4", audio_path=".
     # Split video by defined part length
     for i, start in enumerate(range(0, int(final_video.duration), part_length)):
         end = min(start + part_length, final_video.duration)
-        part_name = f"part_{i+1}.mp4"
+        part_name = f"{title}_part_{i+1}.mp4"
         output_path = os.path.join(output_dir, part_name)
 
         # Use subclip to extract and write each segment
-        final_video.subclip(start, end).write_videofile(output_path, codec="libx264", audio_codec="aac", temp_audiofile=f"./temp/part_{i+1}_temp.mp4")
-        output_files.append(output_path)
+        final_video.subclip(start, end).write_videofile( output_path, codec="libx264", audio_codec="aac", temp_audiofile=f"./temp/{title}_part_{i+1}_temp.mp4")
+        output_files.append(part_name)
 
     # Return the location of the saved video
     return output_files
 
 if __name__ == "__main__":
-    print(processVideo())
+    print(processVideo("emoji 8 😤!!"))
