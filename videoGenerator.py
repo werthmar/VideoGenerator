@@ -1,4 +1,5 @@
 import os
+import random
 from moviepy.editor import VideoFileClip, AudioFileClip, TextClip, CompositeVideoClip, ImageClip
 from PIL import Image, ImageFont, ImageDraw
 from moviepy.video.fx.all import crop
@@ -13,7 +14,7 @@ def get_transcription_with_timing(audio_path):
     recognizer = sr.Recognizer()
     audio_clip = AudioFileClip(audio_path)
     duration = int(audio_clip.duration)
-    step = 5  # seconds
+    step = 2  # seconds
     transcription_with_timing = []
 
     for start_time in range(0, duration, step):
@@ -28,9 +29,13 @@ def get_transcription_with_timing(audio_path):
                 words = recognized_text.split()
                 word_duration = step / max(1, len(words))  # Avoid division by zero
 
-                for i in range(0, len(words), 5):
-                    group = words[i:i+5]  # Take up to 5 words
-                    text = ' '.join(group[:3]) + '\n' + ' '.join(group[3:])
+                for i in range(0, len(words), 3):  # Process in chunks of up to 3 words
+                    group = words[i:i+3]  # Take up to 3 words
+                    if len(group) == 3:
+                        text = group[0] + ' ' + group[1] + '\n' + group[2]
+                    else:
+                        text = ' '.join(group)  # Handle cases where fewer than 3 words
+
                     start_word_time = start_time + i * word_duration
                     group_duration = word_duration * len(group)
                     transcription_with_timing.append((text, start_word_time, group_duration))
@@ -64,7 +69,7 @@ def add_title(video_clip, title):
     
     # Add the title
     title_clip = (TextClip(title.upper(), fontsize=70, font="Verdana-bold", color='black', bg_color='white')
-                  .set_position(('center', 180))  # Position at top center with some margin
+                  .set_position(('center', 440))  # Position at top center with some margin
                   .set_duration(video_clip.duration))
     
     video_with_title= CompositeVideoClip([video_clip, title_clip])
@@ -74,6 +79,8 @@ def add_title(video_clip, title):
     emoji_font = ImageFont.truetype('./fonts/NoToColorEmoji-Regular.ttf', 120)
     # Calculate the size needed for the image
     text_size = emoji_font.getsize(emojis.strip())
+    text_size = (text_size[0], text_size[1] * 2) #increase size so emoji dosnt get cut off
+
     # Create a transparent image
     image = Image.new('RGBA', text_size, (0, 0, 0, 0))
     # Use Pilmoji to draw the emoji onto the image
@@ -81,11 +88,17 @@ def add_title(video_clip, title):
         pilmoji.text((0, 0), emojis.strip(), (0, 0, 0), emoji_font)
 
     # Create the emoji image clip
-    emoji_clip = (ImageClip(np.array(image)).set_position(('center', 280)).set_duration(video_clip.duration))
+    emoji_clip = (ImageClip(np.array(image)).set_position(('center', 550)).set_duration(video_clip.duration))
 
     return CompositeVideoClip([video_with_title, emoji_clip])
 
-
+def add_part_name(video_clip, part_number, part_color):
+    # Only display part name for first 5 sec so its visible in profile
+    part_clip = (TextClip(f'Part {part_number}', fontsize=120, font="Verdana-bold", color=part_color)
+                  .set_position(('center', video_clip.size[1] - 650))  # Position at bottom center with some margin
+                  .set_duration(3.0))
+    
+    return CompositeVideoClip([video_clip, part_clip])
 
 def crop_to_vertical(video, target_width=1080, target_height=1920):
     original_width, original_height = video.size
@@ -136,18 +149,39 @@ def processVideo(title, video_path="./video_templates/MinecraftVid1.mp4", audio_
     video_with_captions = add_captions(cropped_video, captions)
     
     # Add title to the video
-    final_video = add_title(video_with_captions, title)
+    video_with_caption_and_title = add_title(video_with_captions, title)
 
     # Define the part length in seconds
-    part_length = 70  # 1 minute and 10 seconds
+    video_length = int(video_with_caption_and_title.duration)
+    # Make 4 parts
+    if video_length >= 260:
+        part_length = int(video_length / 4)
+    # Make 3 parts
+    elif video_length >= 190:
+        part_length = int(video_length / 3)
+    # Make 2 parts
+    elif video_length >= 130:
+        part_length = int(video_length / 2)
+    # Make 1 part
+    else:
+        part_length = video_length
+
+    #part_length = 70  # 1 minute and 10 seconds
 
     output_files = []
 
+    # Pick a random color for the part text
+    colors = ["cyan", "red", "blue", "green", "purple", "pink", "orange", "yellow", "magenta"]
+    part_color = random.choice(colors)
+
     # Split video by defined part length
-    for i, start in enumerate(range(0, int(final_video.duration), part_length)):
-        end = min(start + part_length, final_video.duration)
+    for i, start in enumerate(range(0, video_length, part_length)):
+        end = min(start + part_length, video_with_caption_and_title.duration)
         part_name = f"{title}_part_{i+1}.mp4"
         output_path = os.path.join(output_dir, part_name)
+
+        # Add part name for thumbmail
+        final_video = add_part_name(video_with_caption_and_title, i + 1, part_color)
 
         # Use subclip to extract and write each segment
         final_video.subclip(start, end).write_videofile( output_path, codec="libx264", audio_codec="aac", temp_audiofile=f"./temp/{title}_part_{i+1}_temp.mp4")

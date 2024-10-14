@@ -1,27 +1,27 @@
 from TTS.api import TTS
 import os
+import json
 
 #using coqui-ai tts
 def generateAudio(story: str, output_file: str = "./generated_audio/output.wav"):
     # Initialize Coqui TTS with a specific model
     # Replace 'tts_models/en/ljspeech/glow-tts' with the model you wish to use
     tts = TTS(model_name="tts_models/en/jenny/jenny")
-    #tts = TTS(model_name="tts_models/en/ljspeech/speedy-speech")
-
+    #tts = TTS("tts_models/en/ljspeech/tacotron2-DDC")
     # Generate speech from the story text and save to the specified output file
     tts.tts_to_file(
         text=story,
         file_path=output_file,
         split_sentences=True,
-        speed=0.9,
-        pitch=-1,
-        effects=["reverb"],
+        #speed=0.9,
+        #pitch=2,
+        #effects=["reverb"],
         #emotion="calm"
-        emotion="excited",
+        #emotion="excited",
     )
     
     #print(f"Audio generated and saved to {output_file}")
-    return output_file
+    #return output_file
 
 
 
