@@ -64,7 +64,7 @@ def add_title(video_clip, title):
     
     # Add the title
     title_clip = (TextClip(title.upper(), fontsize=70, font="Verdana-bold", color='black', bg_color='white')
-                  .set_position(('center', 50))  # Position at top center with some margin
+                  .set_position(('center', 180))  # Position at top center with some margin
                   .set_duration(video_clip.duration))
     
     video_with_title= CompositeVideoClip([video_clip, title_clip])
@@ -81,7 +81,7 @@ def add_title(video_clip, title):
         pilmoji.text((0, 0), emojis.strip(), (0, 0, 0), emoji_font)
 
     # Create the emoji image clip
-    emoji_clip = (ImageClip(np.array(image)).set_position(('center', 160)).set_duration(video_clip.duration))
+    emoji_clip = (ImageClip(np.array(image)).set_position(('center', 280)).set_duration(video_clip.duration))
 
     return CompositeVideoClip([video_with_title, emoji_clip])
 

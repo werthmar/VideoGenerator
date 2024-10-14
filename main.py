@@ -1,6 +1,6 @@
 from storyGenerator import generateStory
 from inputStory import manualStoryInput
-from audioGenerator import generateAudio
+from coqui_audioGenerator import generateAudio
 from videoPicker import selectRandomVideo
 from videoGenerator import processVideo
 from uploader import upload
@@ -20,6 +20,7 @@ def main():
     for item in stories:
         story = item['story']
         title = item['title']    
+        tags = item['tags']
         print(f"\nProcessing story: {title}")
 
         # 2. Convert story to audio (TTS)
@@ -36,7 +37,7 @@ def main():
 
         # 4. Upload every video part to TikTok
         for x, video in enumerate(generatedVideos, start=1):
-            upload(f'{title} Part {x}', video)
+            upload(f'{title} Part {x} {tags}', video)
 
     # 5. Cleanup
     clear_directory('./temp/')

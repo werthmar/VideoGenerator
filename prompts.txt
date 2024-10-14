@@ -4,11 +4,28 @@ how your family tried to steal your house, your car or any other valuable or
 a am i the asshole story or
 a how i got fired story or
 a what was your wierdes customer interaction or wierdest request you got working a certain job or
-an encounter with a crazy karen
+an encounter with a crazy karen or
+how you took revenge on a bully
 
-write everything in 1 paragraph. do not use the special signs like - or ". Write in multiple parts without specifying the parts. A Story segment can cross over multiple parts. Try to be around 800 words. Do not use Abbreviations like HR, write the full word instead. After the story generate a compelling title for this story in 2-3 short words with an emoji at the end and exclamationmarks. Use normal, everyday language and avoid fancy words, wordplay or metaphors. Write like a real human talking about their experience.
+
+Make these stories exciting, like a really angry cutomer interaction that spirals out of controll and then a big payoff at the end like the customer beeing arrested. Write everything in 1 paragraph. do not use the special signs like - or ". Write in multiple parts without specifying the parts. A Story segment can cross over multiple parts. Try to be around 800 to 1600 words. Do not use Abbreviations like HR, write the full word instead. Use normal, everyday language and avoid fancy words, wordplay or metaphors. Write like a real human talking about their experience. However wirte the storie in a way that makes it easier for a text to speech model to read it.
+
+After the story generate a compelling title for this story in 2-3 short words with an emoji at the end and exclamationmarks. Write <title></title> and put the title withing these brackets
+
+Also add multiple Tags at the end. All tags start with a #. you always must include the tags #foru #foryoupage, #tts #funny, #fyp, #redditstories, #reddit. Add at least 16 other tags fitting the story like #karen when its a "karen" story or #aita when its a "am i the asshole" story. You can also add tags that help the video to get more traction on tiktok like #POV or #comedy. Write <tags></tags> and put the tags withing these brackets.
 
 
 
 old:
 each part should have a maximum of 950 characters including spaces
+
+Idee:
+make new accounts with grils as profile pic (asian egirl pic)
+Add tags
+I need to fix the audio and captions!!
+title further down
+more minecraft vids
+add chatgpt voices (with random selection)
+automatic upload 10 stories a day
+other account for lovestories
+tiktok gameplay (rolling ball, coin collect, temple run, happy wheels)

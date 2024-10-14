@@ -1,3 +1,5 @@
+import re
+
 def read_multiline_input(prompt="Enter story (type 'END' on a new line to finish):\n"):
     print(prompt)
     lines = []
@@ -16,16 +18,16 @@ def manualStoryInput():
         story = "\n".join(story_lines)
         print("\nStory entry complete.")
 
-
         if story.strip().lower() == 'go':
             print("Starting generator...")
             break
 
         else:
-            title = input("Please enter a title for your story: ").strip()
+            # Clean the story
+            title, tags, cleaned_story = extract_title_and_tags(story)
             # Add the story and title to the list as a dictionary
-            stories.append({'story': story, 'title': title})
-            print(f"Story '{title}' has been added.\n")
+            stories.append({'story': cleaned_story, 'title': title, 'tags': tags})
+            print(f"Story '{title}' has been added. Tags: {tags}\n")
 
             # Ask if user wants to add another story
             x = input("Add another story? (y/n)").strip().lower()
@@ -36,9 +38,28 @@ def manualStoryInput():
     # Optionally print all stories collected
     print("\nAll Stories:")
     for item in stories:
-        print(f"Title: {item['title']}\nStory: {item['story']}\n")
+        print(f"Title: {item['title']}\nTags: {item['tags']}\nStory: {item['story']}\n")
 
     return stories
+
+def extract_title_and_tags(text):
+    # Regular expressions to find title and tags
+    title_pattern = r'<title>(.*?)<\/title>'
+    tags_pattern = r'<tags>(.*?)<\/tags>'
+
+    # Extract title and tags
+    title_match = re.search(title_pattern, text)
+    tags_match = re.search(tags_pattern, text)
+
+    # Extract and strip the title and tags
+    title = title_match.group(1).strip() if title_match else None
+    tags = tags_match.group(1).strip() if tags_match else None
+
+    # Remove the title and tags from the text
+    text_without_title = re.sub(title_pattern, '', text)
+    text_without_title_and_tags = re.sub(tags_pattern, '', text_without_title)
+
+    return title, tags, text_without_title_and_tags
 
 
 if __name__ == "__main__":

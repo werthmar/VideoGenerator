@@ -13,7 +13,7 @@ install imagemagic:
 Noje.js
 GoogleChrome
 
-follow install instructions of tiktok_uploader (readme.md inside folder)
+follow install instructions of tiktok_uploader (readme.md inside folder) -> requirements.txt install not necessary bcs its included in main requirements.txt
 AFTER installing the requirements txt for the tiktok uploader reinstall the requirements txt of the videoGenerator bcs we need an older version of one of the dependecies (using pip install -r requirements.txt)
     adjust config.txt (VIDEOS_DIR= "./VideosDirPath" change to appropriate path)
 
