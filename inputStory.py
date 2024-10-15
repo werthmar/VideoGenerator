@@ -25,6 +25,7 @@ def manualStoryInput():
         else:
             # Clean the story
             title, tags, cleaned_story = extract_title_and_tags(story)
+
             # Add the story and title to the list as a dictionary
             stories.append({'story': cleaned_story, 'title': title, 'tags': tags})
             print(f"Story '{title}' has been added. Tags: {tags}\n")
@@ -55,11 +56,12 @@ def extract_title_and_tags(text):
     title = title_match.group(1).strip() if title_match else None
     tags = tags_match.group(1).strip() if tags_match else None
 
-    # Remove the title and tags from the text
+    # Remove the title and tags and line breaks from the text
     text_without_title = re.sub(title_pattern, '', text)
     text_without_title_and_tags = re.sub(tags_pattern, '', text_without_title)
+    text_without_title_and_tags_and_line_breaks = text_without_title_and_tags.replace("\n", "")
 
-    return title, tags, text_without_title_and_tags
+    return title, tags, text_without_title_and_tags_and_line_breaks
 
 
 if __name__ == "__main__":

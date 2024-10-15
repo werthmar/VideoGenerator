@@ -13,6 +13,8 @@ install imagemagic:
 Noje.js
 GoogleChrome
 
+Gemini Method: install google cloud cli: https://cloud.google.com/sdk/docs/install
+
 follow install instructions of tiktok_uploader (readme.md inside folder) -> requirements.txt install not necessary bcs its included in main requirements.txt
 AFTER installing the requirements txt for the tiktok uploader reinstall the requirements txt of the videoGenerator bcs we need an older version of one of the dependecies (using pip install -r requirements.txt)
     adjust config.txt (VIDEOS_DIR= "./VideosDirPath" change to appropriate path)
@@ -25,3 +27,7 @@ pip install -r requirements.txt
 <Videos>
 For Downloaded videos if they are corrupted run:
     ffmpeg -i input.mp4 -c:v libx264 -c:a aac output.mp4
+
+<h1>Startup</h1>
+python_enviroment/bin/activate
+gcloud init

@@ -27,5 +27,7 @@ add chatgpt voices (with random selection)
 automatic upload 10 stories a day
 other account for lovestories / liebesdrama (mit tinyglade im hintergrund)
 tiktok gameplay (rolling ball, coin collect, temple run, happy wheels)
-Split Video into even parts instead of fixed 1min10sec
-Welcher part ist das auch auf dem Thumbmail / die ersten 5 sec des videos mitanzeigen damit man das aus der gallerie direkt sieht.
+lovedrama stories als topic
+new font for captions download
+Remove title after 10sec into video
+Add tldr to first video

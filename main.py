@@ -1,6 +1,7 @@
 from storyGenerator import generateStory
 from inputStory import manualStoryInput
-from coqui_audioGenerator import generateAudio
+#from coqui_audioGenerator import generateAudio
+from gemeni_audioGenerator import generate_audio_and_subtitels
 from videoPicker import selectRandomVideo
 from videoGenerator import processVideo
 from uploader import upload
@@ -23,16 +24,16 @@ def main():
         tags = item['tags']
         print(f"\nProcessing story: {title}")
 
-        # 2. Convert story to audio (TTS)
+        # 2. Convert story to audio (TTS) and add subtitles
         print("Generating audio...")
-        audio_file = generateAudio(story)
-        print(f"Audio file created: {audio_file}")
+        audio_file, transcriptionFile = generate_audio_and_subtitels(story)
+        print(f"Audio file created: {audio_file}, Transcription file created {transcriptionFile}")
 
         # 3. Pick a video template and generate a video
         print("Generating video...")
         videoTemplate = selectRandomVideo()
         print(f"Selected video: {videoTemplate}")
-        generatedVideos = processVideo(title, video_path=videoTemplate)
+        generatedVideos = processVideo(title, video_path=videoTemplate, audio_path=audio_file)
         print(f"Video file created: {generatedVideos}")
 
         # 4. Upload every video part to TikTok

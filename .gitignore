@@ -6,3 +6,4 @@ generated_video/*
 generated_audio/*
 temp/*
 __pycache__
+videogenerator_google_credentials.json

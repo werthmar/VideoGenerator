@@ -8,8 +8,9 @@ from pilmoji import Pilmoji
 import numpy as np
 import re
 import emoji
+from gemeni_subtitleGenerator import load_transcription_results
 
-# Function to generate transcription with timing
+# Function to generate transcription with timing OLD, now using gemeni_subtitleGenerator
 def get_transcription_with_timing(audio_path):
     recognizer = sr.Recognizer()
     audio_clip = AudioFileClip(audio_path)
@@ -49,17 +50,24 @@ def get_transcription_with_timing(audio_path):
 
 # Function to add captions to video
 def add_captions(video_clip, captions):
-    output_clips = [video_clip]
+    # Create a list of text clips based on transcription data
+    text_clips = []
+    for word_info in captions:
+        word = word_info['word']
+        start_time = word_info['start_time']
+        end_time = word_info['end_time']
+        text_clip = (
+            TextClip(txt=word.upper(), fontsize=100, font="./fonts/Rubik-ExtraBold.ttf", color='white', stroke_color='black', stroke_width=8) #Verdana-bold
+                    .set_position('center', 'center')
+                    .set_start(start_time)
+                    .set_duration(end_time - start_time)
+            )
+        text_clips.append(text_clip)
 
-    for text, start_time, duration in captions:
-        text = text.upper()  # Convert text to uppercase
-        text_clip = (TextClip(txt=text, fontsize=80, font="Verdana-bold", color='white', stroke_color='black', stroke_width=6)
-                     .set_position('center', 'center')
-                     .set_duration(duration)
-                     .set_start(start_time))
-        output_clips.append(text_clip)
+    # Overlay the text clips on the video
+    return CompositeVideoClip([video_clip, *text_clips], size=video_clip.size)
 
-    return CompositeVideoClip(output_clips, size=video_clip.size)
+    #return CompositeVideoClip(output_clips, size=video_clip.size)
 
 def add_title(video_clip, title):
     # Extract emojis
@@ -70,7 +78,7 @@ def add_title(video_clip, title):
     # Add the title
     title_clip = (TextClip(title.upper(), fontsize=70, font="Verdana-bold", color='black', bg_color='white')
                   .set_position(('center', 440))  # Position at top center with some margin
-                  .set_duration(video_clip.duration))
+                  .set_duration(10.0)) #video_clip.duration
     
     video_with_title= CompositeVideoClip([video_clip, title_clip])
     #return CompositeVideoClip([video_clip, title_clip])
@@ -88,7 +96,7 @@ def add_title(video_clip, title):
         pilmoji.text((0, 0), emojis.strip(), (0, 0, 0), emoji_font)
 
     # Create the emoji image clip
-    emoji_clip = (ImageClip(np.array(image)).set_position(('center', 550)).set_duration(video_clip.duration))
+    emoji_clip = (ImageClip(np.array(image)).set_position(('center', 550)).set_duration(10.0)) #video_clip.duration
 
     return CompositeVideoClip([video_with_title, emoji_clip])
 
@@ -125,6 +133,11 @@ def split_video_into_parts(video_clip, part_duration):
     parts = []
     for start_time in range(0, int(duration), part_duration):
         end_time = min(start_time + part_duration, duration)
+        
+        # Make parts overlap
+        if end_time != duration:
+            min(start_time + part_duration + 5, duration)
+
         part = video_clip.subclip(start_time, end_time)
         parts.append(part)
     return parts
@@ -144,15 +157,13 @@ def processVideo(title, video_path="./video_templates/MinecraftVid1.mp4", audio_
     cropped_video = crop_to_vertical(video_clip)
 
     # Get automatic captions
-    captions = get_transcription_with_timing(audio_path)
+    #captions = get_transcription_with_timing(audio_path)
+    captions = load_transcription_results()
     # Add captions to video
     video_with_captions = add_captions(cropped_video, captions)
-    
-    # Add title to the video
-    video_with_caption_and_title = add_title(video_with_captions, title)
 
     # Define the part length in seconds
-    video_length = int(video_with_caption_and_title.duration)
+    video_length = int(video_with_captions.duration)
     # Make 4 parts
     if video_length >= 260:
         part_length = int(video_length / 4)
@@ -176,12 +187,15 @@ def processVideo(title, video_path="./video_templates/MinecraftVid1.mp4", audio_
 
     # Split video by defined part length
     for i, start in enumerate(range(0, video_length, part_length)):
-        end = min(start + part_length, video_with_caption_and_title.duration)
+        end = min(start + part_length, video_with_captions.duration)
         part_name = f"{title}_part_{i+1}.mp4"
         output_path = os.path.join(output_dir, part_name)
 
+        # Add title to the video
+        video_with_captions_and_title = add_title(video_with_captions, title)
+
         # Add part name for thumbmail
-        final_video = add_part_name(video_with_caption_and_title, i + 1, part_color)
+        final_video = add_part_name(video_with_captions_and_title, i + 1, part_color)
 
         # Use subclip to extract and write each segment
         final_video.subclip(start, end).write_videofile( output_path, codec="libx264", audio_codec="aac", temp_audiofile=f"./temp/{title}_part_{i+1}_temp.mp4")
