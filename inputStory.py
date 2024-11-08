@@ -44,24 +44,25 @@ def manualStoryInput():
     return stories
 
 def extract_title_and_tags(text):
-    # Regular expressions to find title and tags
-    title_pattern = r'<title>(.*?)<\/title>'
-    tags_pattern = r'<tags>(.*?)<\/tags>'
+    # Improved patterns to handle any whitespace between tags and text,
+    # and to make it case insensitive if needed.
+    title_pattern = r'<title\s*>(.*?)<\/title\s*>'
+    tags_pattern = r'<tags\s*>(.*?)<\/tags\s*>'
 
     # Extract title and tags
-    title_match = re.search(title_pattern, text)
-    tags_match = re.search(tags_pattern, text)
+    title_match = re.search(title_pattern, text, re.IGNORECASE)
+    tags_match = re.search(tags_pattern, text, re.IGNORECASE)
 
     # Extract and strip the title and tags
     title = title_match.group(1).strip() if title_match else None
     tags = tags_match.group(1).strip() if tags_match else None
 
-    # Remove the title and tags and line breaks from the text
-    text_without_title = re.sub(title_pattern, '', text)
-    text_without_title_and_tags = re.sub(tags_pattern, '', text_without_title)
-    text_without_title_and_tags_and_line_breaks = text_without_title_and_tags.replace("\n", "")
+    # Remove the title and tags, and line breaks from the text
+    text_without_title = re.sub(title_pattern, '', text, flags=re.IGNORECASE)
+    text_without_title_and_tags = re.sub(tags_pattern, '', text_without_title, flags=re.IGNORECASE)
+    #text_without_title_and_tags_and_line_breaks = text_without_title_and_tags.replace("\n", "").strip()
 
-    return title, tags, text_without_title_and_tags_and_line_breaks
+    return title, tags, text_without_title_and_tags
 
 
 if __name__ == "__main__":

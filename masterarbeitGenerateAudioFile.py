@@ -11,15 +11,13 @@ def generateAudio(story, outputFile="./generated_audio/output.wav"):
 
     # Choose a random voice for the video
     available_voices = [
-        {'name': "en-US-Journey-F", 'ssml_gender': texttospeech.SsmlVoiceGender.FEMALE},
-        {'name': "en-US-Journey-O", 'ssml_gender': texttospeech.SsmlVoiceGender.FEMALE},
-        #{'name': "en-US-Journey-D", 'ssml_gender': texttospeech.SsmlVoiceGender.MALE},
+        {'name': "de-DE-Journey-F", 'ssml_gender': texttospeech.SsmlVoiceGender.FEMALE},
     ]
     choosen_voice= random.choice(available_voices)
 
     voice = texttospeech.VoiceSelectionParams(
         #language_code="en-US", ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL
-        language_code="en-US", name=choosen_voice['name'], ssml_gender=choosen_voice['ssml_gender']
+        language_code="de-DE", name=choosen_voice['name'], ssml_gender=choosen_voice['ssml_gender']
 
     )
     # Select the type of audio file you want returned (LINEAR16=WAV, MP3 = MP3)
@@ -46,7 +44,7 @@ def list_voices():
     client = texttospeech.TextToSpeechClient()
 
     # Performs the list voices request
-    voices = client.list_voices(language_code="en-US")
+    voices = client.list_voices(language_code="de-DE")
 
     for voice in voices.voices:
         # Display the voice's name. Example: tpc-vocoded
@@ -70,6 +68,30 @@ def generate_audio_and_subtitels(story):
     return audioFile, transcriptionFile
 
 if __name__ == "__main__":
-    list_voices()
-    #generateAudio("This story is a test my man. Lots of love. Marlon")
+    #list_voices()
+
+    # Step 1: Create a list to store stories
+    stories = []
+
+    print("Enter your stories (type 'done' when finished):")
+
+    # Step 2: Take user input in a loop and store stories
+    while True:
+        story = input("Enter a story: ")
+        if story.lower() == 'done':
+            break
+        stories.append(story)
+
+    # Define a function to process each story (e.g., print or transform it)
+    def process_story(index, story):
+        print(f"Processing story: {story}")
+        generateAudio(story, outputFile=f"./generated_audio/output{index}.wav")
+
+    # Step 3: Run the function for each story
+    for index, story in enumerate(stories, start=1):
+        process_story(index, story)
+
+
+    #generateAudio("Es war einmal ein kleines süßes Mädchen, das hatte jedermann lieb, der sie nur ansah, am allerliebsten aber ihre Großmutter.")
+
     #generate_subtitles

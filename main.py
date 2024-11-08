@@ -1,6 +1,8 @@
+import random
 from storyGenerator import generateStory
-from inputStory import manualStoryInput
+#from inputStory import manualStoryInput
 #from coqui_audioGenerator import generateAudio
+from gemeni_storyGenerator import generateStory
 from gemeni_audioGenerator import generate_audio_and_subtitels
 from videoPicker import selectRandomVideo
 from videoGenerator import processVideo
@@ -9,19 +11,18 @@ import os
 import glob
 
 def main():
-    # 1. Generate the story
-    print("Generating story...")
-    #story = generateStory()
-    #print(f"Story generated: {story}")
     
-    # Manual Method
-    stories = manualStoryInput()
+    while True:
 
-    # Process each Story
-    for item in stories:
-        story = item['story']
-        title = item['title']    
-        tags = item['tags']
+        # 1. Generate the story
+        # Manual Method
+        #stories = manualStoryInput()
+
+        # Gemini Method
+        print("Generating story...")
+        title, tags, story = generateStory()
+
+        # Process each Story
         print(f"\nProcessing story: {title}")
 
         # 2. Convert story to audio (TTS) and add subtitles
@@ -36,14 +37,18 @@ def main():
         generatedVideos = processVideo(title, video_path=videoTemplate, audio_path=audio_file)
         print(f"Video file created: {generatedVideos}")
 
+        # 5. Select TikTok Account
+        available_accounts = ['my_saved_username', 'storiesaboutstufff']
+        selected_account = random.choice(available_accounts)
+
         # 4. Upload every video part to TikTok
         for x, video in enumerate(generatedVideos, start=1):
-            upload(f'{title} Part {x} {tags}', video)
+            upload(f'{title} Part {x} {tags}', video, selected_account)
 
-    # 5. Cleanup
-    clear_directory('./temp/')
-    clear_directory('./generated_video/')
-    clear_directory('./generated_audio/')
+        # 5. Cleanup
+        clear_directory('./temp/')
+        clear_directory('./generated_video/')
+        clear_directory('./generated_audio/')
 
 
 def clear_directory(directory_path):

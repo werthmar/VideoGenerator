@@ -69,7 +69,7 @@ def add_captions(video_clip, captions):
 
     #return CompositeVideoClip(output_clips, size=video_clip.size)
 
-def add_title(video_clip, title):
+def add_title(video_clip, title, start):
     # Extract emojis
     emojis = [char for char in title if char in emoji.EMOJI_DATA]
     emojis = ''.join(emojis)
@@ -78,7 +78,8 @@ def add_title(video_clip, title):
     # Add the title
     title_clip = (TextClip(title.upper(), fontsize=70, font="Verdana-bold", color='black', bg_color='white')
                   .set_position(('center', 440))  # Position at top center with some margin
-                  .set_duration(10.0)) #video_clip.duration
+                  .set_start(start)
+                  .set_duration(7.0)) #video_clip.duration
     
     video_with_title= CompositeVideoClip([video_clip, title_clip])
     #return CompositeVideoClip([video_clip, title_clip])
@@ -96,15 +97,19 @@ def add_title(video_clip, title):
         pilmoji.text((0, 0), emojis.strip(), (0, 0, 0), emoji_font)
 
     # Create the emoji image clip
-    emoji_clip = (ImageClip(np.array(image)).set_position(('center', 550)).set_duration(10.0)) #video_clip.duration
+    emoji_clip = (ImageClip(np.array(image))
+                  .set_position(('center', 550))
+                  .set_start(start)
+                  .set_duration(7.0)) #video_clip.duration
 
     return CompositeVideoClip([video_with_title, emoji_clip])
 
-def add_part_name(video_clip, part_number, part_color):
+def add_part_name(video_clip, part_number, part_color, start):
     # Only display part name for first 5 sec so its visible in profile
-    part_clip = (TextClip(f'Part {part_number}', fontsize=120, font="Verdana-bold", color=part_color)
-                  .set_position(('center', video_clip.size[1] - 650))  # Position at bottom center with some margin
-                  .set_duration(3.0))
+    part_clip = (TextClip(f'Part {part_number}', fontsize=120, font="./fonts/Rubik-ExtraBold.ttf", color=part_color, stroke_color="white", stroke_width=8)
+                  .set_position(('center', 700))  # Position at bottom center with some margin
+                  .set_start(start)
+                  .set_duration(2.0))
     
     return CompositeVideoClip([video_clip, part_clip])
 
@@ -128,19 +133,23 @@ def crop_to_vertical(video, target_width=1080, target_height=1920):
     # Resize to the target resolution after cropping
     return video.resize((target_width, target_height))
 
-def split_video_into_parts(video_clip, part_duration):
-    duration = video_clip.duration
-    parts = []
-    for start_time in range(0, int(duration), part_duration):
-        end_time = min(start_time + part_duration, duration)
-        
-        # Make parts overlap
-        if end_time != duration:
-            min(start_time + part_duration + 5, duration)
+def define_part_duration(video_duration):
+    #other idea just make video.duration = partduration * numerOfParts
+    # Define the part length in seconds
+    number_of_parts = 1
 
-        part = video_clip.subclip(start_time, end_time)
-        parts.append(part)
-    return parts
+    # Decide the number of parts based on video length
+    if video_duration >= 420:
+        number_of_parts = 4
+    elif video_duration >= 300:
+        number_of_parts = 3
+    elif video_duration >= 180:
+        number_of_parts = 2
+
+    # Calculate initial part length
+    part_length = video_duration / number_of_parts
+    return int(part_length), number_of_parts
+
 
 # Main function to combine everything
 def processVideo(title, video_path="./video_templates/MinecraftVid1.mp4", audio_path="./generated_audio/output.wav"):
@@ -162,40 +171,30 @@ def processVideo(title, video_path="./video_templates/MinecraftVid1.mp4", audio_
     # Add captions to video
     video_with_captions = add_captions(cropped_video, captions)
 
-    # Define the part length in seconds
+    # Determina part length
     video_length = int(video_with_captions.duration)
-    # Make 4 parts
-    if video_length >= 260:
-        part_length = int(video_length / 4)
-    # Make 3 parts
-    elif video_length >= 190:
-        part_length = int(video_length / 3)
-    # Make 2 parts
-    elif video_length >= 130:
-        part_length = int(video_length / 2)
-    # Make 1 part
-    else:
-        part_length = video_length
+    part_length, number_of_parts = define_part_duration(video_length)
+    #Cap video length to length of parts
+    video_length = part_length * number_of_parts
 
     #part_length = 70  # 1 minute and 10 seconds
-
     output_files = []
 
     # Pick a random color for the part text
-    colors = ["cyan", "red", "blue", "green", "purple", "pink", "orange", "yellow", "magenta"]
-    part_color = random.choice(colors)
+    #colors = ["cyan", "red", "blue", "green", "purple", "pink", "orange", "yellow", "magenta"]
+    #part_color = random.choice(colors)
 
     # Split video by defined part length
     for i, start in enumerate(range(0, video_length, part_length)):
-        end = min(start + part_length, video_with_captions.duration)
+        end = min(start + part_length + 5, video_with_captions.duration)
         part_name = f"{title}_part_{i+1}.mp4"
         output_path = os.path.join(output_dir, part_name)
 
         # Add title to the video
-        video_with_captions_and_title = add_title(video_with_captions, title)
+        video_with_captions_and_title = add_title(video_with_captions, title, start)
 
         # Add part name for thumbmail
-        final_video = add_part_name(video_with_captions_and_title, i + 1, part_color)
+        final_video = add_part_name(video_with_captions_and_title, i + 1, "black", start)
 
         # Use subclip to extract and write each segment
         final_video.subclip(start, end).write_videofile( output_path, codec="libx264", audio_codec="aac", temp_audiofile=f"./temp/{title}_part_{i+1}_temp.mp4")

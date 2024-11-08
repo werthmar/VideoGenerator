@@ -1,10 +1,10 @@
 import subprocess
 
-def upload(title, video):
+def upload(title, video, account):
     # Define your command as a list
     command = [
         'python', 'cli.py', 'upload',
-        '--user', 'my_saved_username',
+        '--user', account,
         '-v', f'../generated_video/{video}',
         '-t', title
     ]
