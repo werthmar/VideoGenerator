@@ -1,5 +1,17 @@
-<Installation>
+# VideoGenerator
 
+## Overview
+
+VideoGenerator is a Python program designed to automatically generate and upload videos using AI from the Google Cloud Platform. This tool is ideal for content creators who want to streamline their video production process by leveraging advanced AI technologies and cloud services.
+This project was purely made for learning purposes.
+
+## Features
+
+- **Automated Video Generation**: Uses AI to generate stories, tts and captions and combines them with video templates to upload them.
+- **Cloud Integration**: Utilizes Google Cloud Platform services for processing and storage, ensuring scalability and reliability.
+- **TikTok Auto Uploader**: Includes a module for automatically uploading videos to TikTok, saving time and effort, module can be downloaded here: [TikTok-auto-uploader](https://github.com/makiisthenes/TiktokAutoUploader)
+
+## Installation
 install ffmpeg:
     -MacOs: brew install ffmpeg
     -Linux:
@@ -9,9 +21,6 @@ install ffmpeg:
 install imagemagic:
     -MacOs: brew install imagemagick
     -Linux: sudo apt install imagemagick
-
-Noje.js
-GoogleChrome
 
 Gemini Method: install google cloud cli: https://cloud.google.com/sdk/docs/install
 
